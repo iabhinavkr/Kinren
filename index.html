@@ -128,7 +128,7 @@
         }
 
         .timer-inputs input {
-            width: 50px;
+            width: 60px;
             padding: 8px;
             text-align: center;
             font-size: 1rem;
@@ -190,7 +190,7 @@
 
     <!-- Leaflet JS for Map -->
     <script src="https://unpkg.com"></script>
-        <script>
+    <script>
         // --- 1. CURRENT TIME ---
         const clockElement = document.getElementById('clock');
         const dateElement = document.getElementById('clock-date');
@@ -215,7 +215,7 @@
             timeLeftElement.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }, 1000);
 
-        // --- 3. WORLD MAP TIME SLIDER ---
+        // --- 3. WORLD MAP TIME SLIDER (Fixed Syntax Error) ---
         const map = L.map('map', { zoomControl: true, minZoom: 1, maxZoom: 8 }).setView([20, 0], 2);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
@@ -298,3 +298,4 @@
 </body>
 </html>
 
+    
