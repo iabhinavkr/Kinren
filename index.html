@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Prevents AI scrapers from indexing or training on this page -->
     <meta name="robots" content="noai, noimageai">
-    <title>Time Dash</title>
-    <!-- Leaflet CSS for Map -->
-    <link rel="stylesheet" href="https://unpkg.com" />
+    <title>All-in-One Time Dashboard</title>
     <style>
         :root {
             --bg-color: #f0f2f5;
@@ -22,40 +21,62 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg-color);
             margin: 0;
-            padding: 20px;
+            padding: 0 0 20px 0;
             color: var(--text-main);
+            user-select: none; /* Prevents text highlighting */
+        }
+
+        /* Top Bar Info */
+        .contact-bar {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .contact-bar a {
+            color: var(--secondary);
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .contact-bar a:hover {
+            text-decoration: underline;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
+            padding: 0 20px;
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 20px;
         }
 
         .card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 20px;
+            padding: 30px 20px;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             display: flex;
             flex-direction: column;
             align-items: center;
-        }
-
-        .card.wide {
-            grid-column: 1 / -1;
+            justify-content: center;
         }
 
         .card h2 {
             margin-top: 0;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 1px;
+            margin-bottom: 15px;
         }
 
+        /* Clock and Display Layouts */
         #clock {
             font-size: 2.5rem;
             font-weight: bold;
@@ -63,43 +84,17 @@
         }
 
         #time-left {
-            font-size: 1.5rem;
+            font-size: 2.2rem;
             font-weight: 600;
             color: var(--text-main);
             text-align: center;
         }
 
-        #map {
-            width: 100%;
-            height: 350px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-
-        .slider-container {
-            width: 100%;
-            max-width: 600px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-
-        input[type=range] {
-            width: 100%;
-            cursor: pointer;
-        }
-
-        #map-time-display {
-            font-weight: bold;
-            color: var(--primary);
-            font-size: 1.2rem;
-        }
-
         .stopwatch-display, .timer-display {
-            font-size: 2rem;
+            font-size: 2.2rem;
             font-family: monospace;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
+            font-weight: bold;
         }
 
         .controls {
@@ -125,7 +120,7 @@
         .timer-inputs {
             display: flex;
             gap: 5px;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .timer-inputs input {
@@ -138,35 +133,30 @@
         }
     </style>
 </head>
-    
+<!-- Blocks right-click contextual menus -->
 <body oncontextmenu="return false;">
-      <div class="contact-bar">
-        Have questions? <a href="mailto:contact@kinren.in">Contact us!</a>
+
+    <!-- Top Line Info Bar -->
+    <div class="contact-bar">
+        Need assistance? Contact via <a href="mailto:contact@kinren.in">email</a> .
     </div>
 
     <div class="container">
+        <!-- 1. Current Time -->
         <div class="card">
             <h2>Current Time</h2>
             <div id="clock">00:00:00</div>
             <div id="clock-date" style="color: var(--text-muted); margin-top: 5px;"></div>
         </div>
 
+        <!-- 2. Time Left Today -->
         <div class="card">
             <h2>Time Left Today</h2>
             <div id="time-left">00:00:00</div>
             <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Until midnight</div>
         </div>
 
-        <div class="card wide">
-            <h2>World Time Map</h2>
-            <div id="map"></div>
-            <div class="slider-container">
-                <input type="range" id="timezone-slider" min="-12" max="14" value="0" step="0.5">
-                <span id="map-time-display">UTC+0: GMT</span>
-                <span style="font-size: 0.9rem; color: var(--text-muted);">Slide to see local time worldwide</span>
-            </div>
-        </div>
-
+        <!-- 3. Stopwatch -->
         <div class="card">
             <h2>Stopwatch</h2>
             <div class="stopwatch-display" id="stopwatch-display">00:00:00.00</div>
@@ -177,6 +167,7 @@
             </div>
         </div>
 
+        <!-- 4. Timer -->
         <div class="card">
             <h2>Timer</h2>
             <div class="timer-display" id="timer-display">00:00:00</div>
@@ -186,14 +177,14 @@
                 <input type="number" id="t-seconds" placeholder="SS" min="0" max="59">
             </div>
             <div class="controls">
-                <button id="t-start">Set & Start</button>
+                <button id="t-start">Start</button>
                 <button id="t-pause" class="secondary">Pause</button>
                 <button id="t-reset" class="danger">Reset</button>
             </div>
         </div>
     </div>
 
-        <script>
+    <script>
         // --- 1. CURRENT TIME ---
         const clockElement = document.getElementById('clock');
         const dateElement = document.getElementById('clock-date');
@@ -218,34 +209,7 @@
             timeLeftElement.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }, 1000);
 
-        // --- 3. WORLD MAP TIME SLIDER (Fixed Missing Coordinates Syntax Error) ---
-        const map = L.map('map', { zoomControl: true, minZoom: 1, maxZoom: 8 }).setView([0, 0], 2);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors'
-        }).addTo(map);
-
-        setTimeout(() => { map.invalidateSize(); }, 100);
-
-        const slider = document.getElementById('timezone-slider');
-        const mapTimeDisplay = document.getElementById('map-time-display');
-
-        slider.addEventListener('input', (e) => {
-            const val = parseFloat(e.target.value);
-            const sign = val >= 0 ? '+' : '';
-            let label = `UTC${sign}${val}`;
-            if (val % 1 !== 0) {
-                const hrs = Math.floor(val);
-                const mins = (val % 1) * 60;
-                label = `UTC${sign}${hrs}:${mins === 30 ? '30' : '00'}`;
-            }
-            const now = new Date();
-            const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
-            const targetTime = new Date(utcTime + (val * 3600000));
-            mapTimeDisplay.innerText = `${label} : ${targetTime.toLocaleTimeString()}`;
-        });
-        slider.dispatchEvent(new Event('input'));
-
-        // --- 4. STOPWATCH ---
+        // --- 3. STOPWATCH ---
         let swTimer; let swElapsed = 0; let swRunning = false;
         const swDisplay = document.getElementById('stopwatch-display');
 
@@ -268,7 +232,7 @@
         document.getElementById('sw-pause').addEventListener('click', () => { clearInterval(swTimer); swRunning = false; });
         document.getElementById('sw-reset').addEventListener('click', () => { clearInterval(swTimer); swRunning = false; swElapsed = 0; updateSWDisplay(); });
 
-        // --- 5. TIMER ---
+        // --- 4. TIMER ---
         let tTimer; let tTotalSeconds = 0; let tRunning = false;
         const tDisplay = document.getElementById('timer-display');
 
@@ -285,8 +249,13 @@
                 const h = parseInt(document.getElementById('t-hours').value) || 0;
                 const m = parseInt(document.getElementById('t-minutes').value) || 0;
                 const s = parseInt(document.getElementById('t-seconds').value) || 0;
-                tTotalSeconds = (h * 3600) + (m * 60) + s;
+                
+                // If paused, resume from remaining time; otherwise set new inputs
+                if (tTotalSeconds <= 0) {
+                    tTotalSeconds = (h * 3600) + (m * 60) + s;
+                }
                 if (tTotalSeconds <= 0) return;
+
                 tRunning = true; updateTDisplay();
                 tTimer = setInterval(() => { tTotalSeconds--; updateTDisplay(); }, 1000);
             }
