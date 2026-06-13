@@ -3,256 +3,298 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Time</title>
+    <title>All-in-One Time Dashboard</title>
+    <!-- Leaflet CSS for Map -->
+    <link rel="stylesheet" href="https://unpkg.com" />
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --primary: #4a90e2;
+            --secondary: #50e3c2;
+            --danger: #ff4a5a;
+            --text-main: #333333;
+            --text-muted: #777777;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #1e1e2f, #11111b);
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            color: var(--text-main);
         }
 
         .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            max-width: 450px;
-            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
         }
 
-        h2 {
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .card.wide {
+            grid-column: 1 / -1;
+        }
+
+        .card h2 {
+            margin-top: 0;
             font-size: 1.2rem;
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            color: #a5a5b1;
-            margin-bottom: 10px;
+            letter-spacing: 1px;
         }
 
-        .display {
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 3rem;
+        #clock {
+            font-size: 2.5rem;
             font-weight: bold;
-            color: #4ef0ff;
-            text-shadow: 0 0 10px rgba(78, 240, 255, 0.3);
-            margin-bottom: 40px;
+            color: var(--primary);
         }
 
-        .display:last-child {
-            margin-bottom: 0;
-            color: #ff4e79;
-            text-shadow: 0 0 10px rgba(255, 78, 121, 0.3);
+        #time-left {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-main);
+            text-align: center;
+        }
+
+        #map {
+            width: 100%;
+            height: 350px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .slider-container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        input[type=range] {
+            width: 100%;
+            cursor: pointer;
+        }
+
+        #map-time-display {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+
+        .stopwatch-display, .timer-display {
+            font-size: 2rem;
+            font-family: monospace;
+            margin-bottom: 15px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover { opacity: 0.9; }
+        button.danger { background: var(--danger); }
+        button.secondary { background: #6c757d; }
+
+        .timer-inputs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+
+        .timer-inputs input {
+            width: 50px;
+            padding: 8px;
+            text-align: center;
+            font-size: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h2>Current Time</h2>
-        <div id="current-time" class="display">00:00:00</div>
+        <div class="card">
+            <h2>Current Time</h2>
+            <div id="clock">00:00:00</div>
+            <div id="clock-date" style="color: var(--text-muted); margin-top: 5px;"></div>
+        </div>
 
-        <h2>Time Left Today</h2>
-        <div id="countdown" class="display">00:00:00</div>
-    </div>
+        <div class="card">
+            <h2>Time Left Today</h2>
+            <div id="time-left">00:00:00</div>
+            <div style="color: var(--text-muted); font-size: 0.9rem; margin-top: 5px;">Until midnight</div>
+        </div>
 
-    <script>
-        function updateClockAndTimer() {
-            const now = new Date();
+        <div class="card wide">
+            <h2>World Time Map</h2>
+            <div id="map"></div>
+            <div class="slider-container">
+                <input type="range" id="timezone-slider" min="-12" max="14" value="0" step="0.5">
+                <span id="map-time-display">UTC+0: GMT</span>
+                <span style="font-size: 0.9rem; color: var(--text-muted);">Slide to see local time worldwide</span>
+            </div>
+        </div>
 
-            // 1. Format and display current time
-            const curHours = String(now.getHours()).padStart(2, '0');
-            const curMinutes = String(now.getMinutes()).padStart(2, '0');
-            const curSeconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('current-time').textContent = `${curHours}:${curMinutes}:${curSeconds}`;
+        <div class="card">
+            <h2>Stopwatch</h2>
+            <div class="stopwatch-display" id="stopwatch-display">00:00:00.00</div>
+            <div class="controls">
+                <button id="sw-start">Start</button>
+                <button id="sw-pause" class="secondary">Pause</button>
+                <button id="sw-reset" class="danger">Reset</button>
+            </div>
+        </div>
 
-            // 2. Set the end of the day target (23:59:59:999)
-            const endOfDay = new Date();
-            endOfDay.setHours(23, 59, 59, 999);
-
-            // 3. Calculate remaining time
-            const timeDiff = endOfDay - now;
-
-            if (timeDiff <= 0) {
-                document.getElementById('countdown').textContent = "00:00:00";
-                return;
-            }
-
-            // Convert remaining milliseconds to hours, minutes, and seconds
-            const hoursLeft = Math.floor((timeDiff / (1000 * 60 * 60)) % 24);
-            const minutesLeft = Math.floor((timeDiff / (1000 * 60)) % 60);
-            const secondsLeft = Math.floor((timeDiff / 1000) % 60);
-
-            // Pad single digits with leading zeros
-            const displayHours = String(hoursLeft).padStart(2, '0');
-            const displayMinutes = String(minutesLeft).padStart(2, '0');
-            const displaySeconds = String(secondsLeft).padStart(2, '0');
-
-            document.getElementById('countdown').textContent = `${displayHours}:${displayMinutes}:${displaySeconds}`;
-        }
-
-        // Run immediately on page load, then refresh every 1 second
-        updateClockAndTimer();
-        setInterval(updateClockAndTimer, 1000);
-    </script>
-
-</body>
-</html>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Stopwatch</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            align: bottom;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: #0f172a;
-            color: #ffffff;
-        }
-
-        .stopwatch-container {
-            text-align: center;
-            background: #1e293b;
-            padding: 2.5rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            width: 350px;
-        }
-
-        h1 {
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            color: #38bdf8;
-            letter-spacing: 1px;
-        }
-
-        .display {
-            font-size: 3.5rem;
-            font-weight: bold;
-            font-family: monospace;
-            background: #0f172a;
-            padding: 1rem 0;
-            border-radius: 10px;
-            margin-bottom: 2rem;
-            color: #f8fafc;
-            border: 2px solid #334155;
-        }
-
-        .controls {
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-        }
-
-        button {
-            flex: 1;
-            padding: 0.75rem;
-            font-size: 1rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            color: #ffffff;
-        }
-
-        #startBtn { background-color: #22c55e; }
-        #startBtn:hover { background-color: #16a34a; }
-
-        #stopBtn { background-color: #ef4444; }
-        #stopBtn:hover { background-color: #dc2626; }
-
-        #resetBtn { background-color: #64748b; }
-        #resetBtn:hover { background-color: #475569; }
-
-        button:active {
-            transform: scale(0.95);
-        }
-    </style>
-</head>
-<body>
-
-    <div class="stopwatch-container">
-        <h1>STOPWATCH</h1>
-        <div class="display" id="display">00:00:00</div>
-        <div class="controls">
-            <button id="startBtn" onclick="start()">Start</button>
-            <button id="stopBtn" onclick="stop()">Stop</button>
-            <button id="resetBtn" onclick="reset()">Reset</button>
+        <div class="card">
+            <h2>Timer</h2>
+            <div class="timer-display" id="timer-display">00:00:00</div>
+            <div class="timer-inputs" id="timer-inputs">
+                <input type="number" id="t-hours" placeholder="HH" min="0" max="99">
+                <input type="number" id="t-minutes" placeholder="MM" min="0" max="59">
+                <input type="number" id="t-seconds" placeholder="SS" min="0" max="59">
+            </div>
+            <div class="controls">
+                <button id="t-start">Set & Start</button>
+                <button id="t-pause" class="secondary">Pause</button>
+                <button id="t-reset" class="danger">Reset</button>
+            </div>
         </div>
     </div>
 
-    <script>
-        let timer = null;
-        let startTime = 0;
-        let elapsedTime = 0;
-        let isRunning = false;
+    <!-- Leaflet JS for Map -->
+    <script src="https://unpkg.com"></script>
+        <script>
+        // --- 1. CURRENT TIME ---
+        const clockElement = document.getElementById('clock');
+        const dateElement = document.getElementById('clock-date');
+        setInterval(() => {
+            const now = new Date();
+            clockElement.innerText = now.toLocaleTimeString();
+            dateElement.innerText = now.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+        }, 1000);
 
-        const display = document.getElementById("display");
+        // --- 2. TIME LEFT TODAY ---
+        const timeLeftElement = document.getElementById('time-left');
+        setInterval(() => {
+            const now = new Date();
+            const midnight = new Date();
+            midnight.setHours(24, 0, 0, 0);
+            const diff = midnight - now;
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-        function start() {
-            if (!isRunning) {
-                startTime = Date.now() - elapsedTime;
-                timer = setInterval(update, 10);
-                isRunning = true;
+            timeLeftElement.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }, 1000);
+
+        // --- 3. WORLD MAP TIME SLIDER ---
+        const map = L.map('map', { zoomControl: true, minZoom: 1, maxZoom: 8 }).setView([20, 0], 2);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        setTimeout(() => { map.invalidateSize(); }, 100);
+
+        const slider = document.getElementById('timezone-slider');
+        const mapTimeDisplay = document.getElementById('map-time-display');
+
+        slider.addEventListener('input', (e) => {
+            const val = parseFloat(e.target.value);
+            const sign = val >= 0 ? '+' : '';
+            let label = `UTC${sign}${val}`;
+            if (val % 1 !== 0) {
+                const hrs = Math.floor(val);
+                const mins = (val % 1) * 60;
+                label = `UTC${sign}${hrs}:${mins === 30 ? '30' : '00'}`;
             }
+            const now = new Date();
+            const utcTime = now.getTime() + (now.getTimezoneOffset() * 60000);
+            const targetTime = new Date(utcTime + (val * 3600000));
+            mapTimeDisplay.innerText = `${label} : ${targetTime.toLocaleTimeString()}`;
+        });
+        slider.dispatchEvent(new Event('input'));
+
+        // --- 4. STOPWATCH ---
+        let swTimer; let swElapsed = 0; let swRunning = false;
+        const swDisplay = document.getElementById('stopwatch-display');
+
+        function updateSWDisplay() {
+            const ms = Math.floor((swElapsed % 1000) / 10);
+            const secs = Math.floor((swElapsed / 1000) % 60);
+            const mins = Math.floor((swElapsed / (1000 * 60)) % 60);
+            const hrs = Math.floor(swElapsed / (1000 * 60 * 60));
+            swDisplay.innerText = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}.${String(ms).padStart(2, '0')}`;
         }
 
-        function stop() {
-            if (isRunning) {
-                clearInterval(timer);
-                elapsedTime = Date.now() - startTime;
-                isRunning = false;
+        document.getElementById('sw-start').addEventListener('click', () => {
+            if (!swRunning) {
+                swRunning = true;
+                const start = Date.now() - swElapsed;
+                swTimer = setInterval(() => { swElapsed = Date.now() - start; updateSWDisplay(); }, 10);
             }
+        });
+
+        document.getElementById('sw-pause').addEventListener('click', () => { clearInterval(swTimer); swRunning = false; });
+        document.getElementById('sw-reset').addEventListener('click', () => { clearInterval(swTimer); swRunning = false; swElapsed = 0; updateSWDisplay(); });
+
+        // --- 5. TIMER ---
+        let tTimer; let tTotalSeconds = 0; let tRunning = false;
+        const tDisplay = document.getElementById('timer-display');
+
+        function updateTDisplay() {
+            const hrs = Math.floor(tTotalSeconds / 3600);
+            const mins = Math.floor((tTotalSeconds % 3600) / 60);
+            const secs = tTotalSeconds % 60;
+            tDisplay.innerText = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            if (tTotalSeconds <= 0 && tRunning) { clearInterval(tTimer); tRunning = false; alert("Time's up!"); }
         }
 
-        function reset() {
-            clearInterval(timer);
-            startTime = 0;
-            elapsedTime = 0;
-            isRunning = false;
-            display.textContent = "00:00:00";
-        }
+        document.getElementById('t-start').addEventListener('click', () => {
+            if (!tRunning) {
+                const h = parseInt(document.getElementById('t-hours').value) || 0;
+                const m = parseInt(document.getElementById('t-minutes').value) || 0;
+                const s = parseInt(document.getElementById('t-seconds').value) || 0;
+                tTotalSeconds = (h * 3600) + (m * 60) + s;
+                if (tTotalSeconds <= 0) return;
+                tRunning = true; updateTDisplay();
+                tTimer = setInterval(() => { tTotalSeconds--; updateTDisplay(); }, 1000);
+            }
+        });
 
-        function update() {
-            const currentTime = Date.now();
-            elapsedTime = currentTime - startTime;
-
-            let minutes = Math.floor((elapsedTime / (1000 * 60)) % 60);
-            let seconds = Math.floor((elapsedTime / 1000) % 60);
-            let milliseconds = Math.floor((elapsedTime % 1000) / 10);
-
-            minutes = String(minutes).padStart(2, "0");
-            seconds = String(seconds).padStart(2, "0");
-            milliseconds = String(milliseconds).padStart(2, "0");
-
-            display.textContent = `${minutes}:${seconds}:${milliseconds}`;
-        }
+        document.getElementById('t-pause').addEventListener('click', () => { clearInterval(tTimer); tRunning = false; });
+        document.getElementById('t-reset').addEventListener('click', () => {
+            clearInterval(tTimer); tRunning = false; tTotalSeconds = 0; updateTDisplay();
+            document.getElementById('t-hours').value = ''; document.getElementById('t-minutes').value = ''; document.getElementById('t-seconds').value = '';
+        });
     </script>
-
 </body>
 </html>
+
