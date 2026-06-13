@@ -141,7 +141,7 @@
     
 <body oncontextmenu="return false;">
       <div class="contact-bar">
-        Contact via email at <a href="mailto:contact@kinren.in">contact@kinren.in</a>
+        Have questions? <a href="mailto:contact@kinren.in">Contact us!</a>
     </div>
 
     <div class="container">
@@ -193,9 +193,7 @@
         </div>
     </div>
 
-    <!-- Leaflet JS for Map -->
-    <script src="https://unpkg.com"></script>
-    <script>
+        <script>
         // --- 1. CURRENT TIME ---
         const clockElement = document.getElementById('clock');
         const dateElement = document.getElementById('clock-date');
@@ -220,8 +218,8 @@
             timeLeftElement.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
         }, 1000);
 
-        // --- 3. WORLD MAP TIME SLIDER (Fixed Syntax Error) ---
-        const map = L.map('map', { zoomControl: true, minZoom: 1, maxZoom: 8 }).setView([20, 0], 2);
+        // --- 3. WORLD MAP TIME SLIDER (Fixed Missing Coordinates Syntax Error) ---
+        const map = L.map('map', { zoomControl: true, minZoom: 1, maxZoom: 8 }).setView([0, 0], 2);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
@@ -302,5 +300,3 @@
     </script>
 </body>
 </html>
-
-    
