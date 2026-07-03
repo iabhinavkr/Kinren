@@ -165,9 +165,12 @@
             box-shadow: 0 0 0 2px white;
             transition: all 0.2s;
             z-index: 7;
+            opacity: 0;
+            pointer-events: none;
         }
 
         .city-dot.active {
+            opacity: 1;
             background-color: var(--danger);
             transform: translate(-50%, -50%) scale(1.5);
             box-shadow: 0 0 0 2px white, 0 0 8px var(--danger);
@@ -421,25 +424,38 @@
         const cityList = document.getElementById('city-list');
 
         const cityDatabase = {
-            "-10": [{ name: "Honolulu", tz: "Pacific/Honolulu", lat: 21.3, lon: -157.8 }],
-            "-9": [{ name: "Anchorage", tz: "America/Anchorage", lat: 61.2, lon: -149.9 }],
-            "-8": [{ name: "Los Angeles", tz: "America/Los_Angeles", lat: 34.0, lon: -118.2 }],
-            "-7": [{ name: "Denver", tz: "America/Denver", lat: 39.7, lon: -104.9 }],
-            "-6": [{ name: "Chicago", tz: "America/Chicago", lat: 41.8, lon: -87.6 }, { name: "Mexico City", tz: "America/Mexico_City", lat: 19.4, lon: -99.1 }],
-            "-5": [{ name: "New York", tz: "America/New_York", lat: 40.7, lon: -74.0 }, { name: "Bogota", tz: "America/Bogota", lat: 4.7, lon: -74.0 }],
-            "-4": [{ name: "Santiago", tz: "America/Santiago", lat: -33.4, lon: -70.6 }],
-            "-3": [{ name: "Buenos Aires", tz: "America/Buenos_Aires", lat: -34.6, lon: -58.3 }, { name: "Sao Paulo", tz: "America/Sao_Paulo", lat: -23.5, lon: -46.6 }],
-            "0": [{ name: "London", tz: "Europe/London", lat: 51.5, lon: -0.1 }, { name: "Accra", tz: "Africa/Accra", lat: 5.6, lon: -0.2 }],
-            "1": [{ name: "Paris", tz: "Europe/Paris", lat: 48.8, lon: 2.3 }, { name: "Berlin", tz: "Europe/Berlin", lat: 52.5, lon: 13.4 }],
-            "2": [{ name: "Athens", tz: "Europe/Athens", lat: 37.9, lon: 23.7 }, { name: "Cairo", tz: "Africa/Cairo", lat: 30.0, lon: 31.2 }],
-            "3": [{ name: "Moscow", tz: "Europe/Moscow", lat: 55.7, lon: 37.6 }, { name: "Riyadh", tz: "Asia/Riyadh", lat: 24.7, lon: 46.7 }],
-            "4": [{ name: "Dubai", tz: "Asia/Dubai", lat: 25.2, lon: 55.3 }],
-            "5.5": [{ name: "New Delhi", tz: "Asia/Kolkata", lat: 28.6, lon: 77.2 }],
-            "7": [{ name: "Bangkok", tz: "Asia/Bangkok", lat: 13.7, lon: 100.5 }, { name: "Jakarta", tz: "Asia/Jakarta", lat: -6.2, lon: 106.8 }],
-            "8": [{ name: "Beijing", tz: "Asia/Shanghai", lat: 39.9, lon: 116.4 }, { name: "Singapore", tz: "Asia/Singapore", lat: 1.3, lon: 103.8 }],
-            "9": [{ name: "Tokyo", tz: "Asia/Tokyo", lat: 35.6, lon: 139.6 }, { name: "Seoul", tz: "Asia/Seoul", lat: 37.5, lon: 126.9 }],
-            "10": [{ name: "Sydney", tz: "Australia/Sydney", lat: -33.8, lon: 151.2 }],
-            "12": [{ name: "Auckland", tz: "Pacific/Auckland", lat: -36.8, lon: 174.7 }]
+            "-12": [{ name: "Baker Island", lat: 0.19, lon: -176.47 }],
+            "-11": [{ name: "Alofi (Niue)", lat: -19.05, lon: -169.91 }, { name: "Pago Pago (Am. Samoa)", lat: -14.27, lon: -170.70 }],
+            "-10": [{ name: "Honolulu (US)", lat: 21.3, lon: -157.8 }, { name: "Papeete (Fr. Polynesia)", lat: -17.53, lon: -149.56 }],
+            "-9": [{ name: "Juneau (US)", lat: 58.3, lon: -134.4 }],
+            "-8": [{ name: "Los Angeles (US)", lat: 34.0, lon: -118.2 }],
+            "-7": [{ name: "Denver (US)", lat: 39.7, lon: -104.9 }, { name: "Hermosillo (Mexico)", lat: 29.07, lon: -110.95 }],
+            "-6": [{ name: "Chicago (US)", lat: 41.8, lon: -87.6 }, { name: "Mexico City (Mexico)", lat: 19.4, lon: -99.1 }, { name: "San Salvador (El Salvador)", lat: 13.69, lon: -89.19 }, { name: "San Jose (Costa Rica)", lat: 9.92, lon: -84.09 }, { name: "Managua (Nicaragua)", lat: 12.13, lon: -86.25 }],
+            "-5": [{ name: "Washington D.C. (US)", lat: 38.9, lon: -77.0 }, { name: "Ottawa (Canada)", lat: 45.4, lon: -75.7 }, { name: "Bogota (Colombia)", lat: 4.7, lon: -74.0 }, { name: "Lima (Peru)", lat: -12.04, lon: -77.02 }, { name: "Quito (Ecuador)", lat: -0.22, lon: -78.52 }, { name: "Havana (Cuba)", lat: 23.11, lon: -82.36 }, { name: "Kingston (Jamaica)", lat: 17.97, lon: -76.79 }, { name: "Panama City (Panama)", lat: 8.98, lon: -79.51 }],
+            "-4": [{ name: "Caracas (Venezuela)", lat: 10.48, lon: -66.90 }, { name: "Santiago (Chile)", lat: -33.4, lon: -70.6 }, { name: "La Paz (Bolivia)", lat: -16.5, lon: -68.11 }, { name: "Asuncion (Paraguay)", lat: -25.26, lon: -57.63 }, { name: "Georgetown (Guyana)", lat: 6.80, lon: -58.15 }, { name: "San Juan (Puerto Rico)", lat: 18.46, lon: -66.10 }],
+            "-3": [{ name: "Brasilia (Brazil)", lat: -15.82, lon: -47.92 }, { name: "Buenos Aires (Argentina)", lat: -34.6, lon: -58.3 }, { name: "Montevideo (Uruguay)", lat: -34.90, lon: -56.16 }, { name: "Paramaribo (Suriname)", lat: 5.85, lon: -55.20 }],
+            "-2": [{ name: "King Edward Point (S. Georgia)", lat: -54.28, lon: -36.50 }],
+            "-1": [{ name: "Praia (Cape Verde)", lat: 14.93, lon: -23.51 }],
+            "0": [{ name: "London (UK)", lat: 51.5, lon: -0.1 }, { name: "Dublin (Ireland)", lat: 53.34, lon: -6.26 }, { name: "Lisbon (Portugal)", lat: 38.72, lon: -9.13 }, { name: "Reykjavik (Iceland)", lat: 64.14, lon: -21.89 }, { name: "Accra (Ghana)", lat: 5.6, lon: -0.2 }, { name: "Dakar (Senegal)", lat: 14.71, lon: -17.46 }, { name: "Bamako (Mali)", lat: 12.63, lon: -8.00 }, { name: "Abidjan (Ivory Coast)", lat: 5.35, lon: -4.00 }],
+            "1": [{ name: "Paris (France)", lat: 48.8, lon: 2.3 }, { name: "Berlin (Germany)", lat: 52.5, lon: 13.4 }, { name: "Rome (Italy)", lat: 41.9, lon: 12.4 }, { name: "Madrid (Spain)", lat: 40.4, lon: -3.7 }, { name: "Vienna (Austria)", lat: 48.2, lon: 16.3 }, { name: "Warsaw (Poland)", lat: 52.2, lon: 21.0 }, { name: "Stockholm (Sweden)", lat: 59.3, lon: 18.0 }, { name: "Oslo (Norway)", lat: 59.9, lon: 10.7 }, { name: "Algiers (Algeria)", lat: 36.75, lon: 3.05 }, { name: "Tunis (Tunisia)", lat: 36.81, lon: 10.18 }, { name: "Kinshasa (DRC)", lat: -4.44, lon: 15.26 }],
+            "2": [{ name: "Athens (Greece)", lat: 37.9, lon: 23.7 }, { name: "Cairo (Egypt)", lat: 30.0, lon: 31.2 }, { name: "Jerusalem (Israel)", lat: 31.7, lon: 35.2 }, { name: "Amman (Jordan)", lat: 31.9, lon: 35.9 }, { name: "Damascus (Syria)", lat: 33.5, lon: 36.2 }, { name: "Beirut (Lebanon)", lat: 33.8, lon: 35.5 }, { name: "Kyiv (Ukraine)", lat: 50.4, lon: 30.5 }, { name: "Helsinki (Finland)", lat: 60.1, lon: 24.9 }, { name: "Cape Town (S. Africa)", lat: -33.92, lon: 18.42 }, { name: "Harare (Zimbabwe)", lat: -17.82, lon: 31.04 }, { name: "Tripoli (Libya)", lat: 32.88, lon: 13.19 }],
+            "3": [{ name: "Moscow (Russia)", lat: 55.7, lon: 37.6 }, { name: "Riyadh (Saudi Arabia)", lat: 24.7, lon: 46.7 }, { name: "Ankara (Turkey)", lat: 39.9, lon: 32.8 }, { name: "Baghdad (Iraq)", lat: 33.3, lon: 44.4 }, { name: "Nairobi (Kenya)", lat: -1.2, lon: 36.8 }, { name: "Addis Ababa (Ethiopia)", lat: 9.0, lon: 38.7 }, { name: "Doha (Qatar)", lat: 25.2, lon: 51.5 }, { name: "Kuwait City (Kuwait)", lat: 29.3, lon: 47.9 }, { name: "Minsk (Belarus)", lat: 53.9, lon: 27.5 }, { name: "Kampala (Uganda)", lat: 0.34, lon: 32.58 }],
+            "3.5": [{ name: "Tehran (Iran)", lat: 35.6, lon: 51.3 }],
+            "4": [{ name: "Abu Dhabi (UAE)", lat: 24.4, lon: 54.3 }, { name: "Baku (Azerbaijan)", lat: 40.4, lon: 49.8 }, { name: "Tbilisi (Georgia)", lat: 41.7, lon: 44.8 }, { name: "Yerevan (Armenia)", lat: 40.1, lon: 44.5 }, { name: "Muscat (Oman)", lat: 23.5, lon: 58.4 }],
+            "4.5": [{ name: "Kabul (Afghanistan)", lat: 34.5, lon: 69.1 }],
+            "5": [{ name: "Islamabad (Pakistan)", lat: 33.6, lon: 73.0 }, { name: "Tashkent (Uzbekistan)", lat: 41.3, lon: 69.2 }, { name: "Dushanbe (Tajikistan)", lat: 38.5, lon: 68.7 }],
+            "5.5": [{ name: "New Delhi (India)", lat: 28.6, lon: 77.2 }, { name: "Colombo (Sri Lanka)", lat: 6.9, lon: 79.8 }],
+            "5.75": [{ name: "Kathmandu (Nepal)", lat: 27.7, lon: 85.3 }],
+            "6": [{ name: "Dhaka (Bangladesh)", lat: 23.8, lon: 90.4 }, { name: "Astana (Kazakhstan)", lat: 51.1, lon: 71.4 }, { name: "Bishkek (Kyrgyzstan)", lat: 42.8, lon: 74.5 }],
+            "6.5": [{ name: "Yangon (Myanmar)", lat: 16.8, lon: 96.1 }],
+            "7": [{ name: "Bangkok (Thailand)", lat: 13.7, lon: 100.5 }, { name: "Jakarta (Indonesia)", lat: -6.2, lon: 106.8 }, { name: "Hanoi (Vietnam)", lat: 21.0, lon: 105.8 }, { name: "Phnom Penh (Cambodia)", lat: 11.5, lon: 104.9 }, { name: "Vientiane (Laos)", lat: 17.9, lon: 102.6 }],
+            "8": [{ name: "Beijing (China)", lat: 39.9, lon: 116.4 }, { name: "Singapore", lat: 1.3, lon: 103.8 }, { name: "Manila (Philippines)", lat: 14.5, lon: 120.9 }, { name: "Kuala Lumpur (Malaysia)", lat: 3.1, lon: 101.6 }, { name: "Taipei (Taiwan)", lat: 25.0, lon: 121.5 }, { name: "Ulaanbaatar (Mongolia)", lat: 47.9, lon: 106.9 }],
+            "9": [{ name: "Tokyo (Japan)", lat: 35.6, lon: 139.6 }, { name: "Seoul (South Korea)", lat: 37.5, lon: 126.9 }, { name: "Pyongyang (North Korea)", lat: 39.0, lon: 125.7 }, { name: "Dili (Timor-Leste)", lat: -8.5, lon: 125.5 }],
+            "10": [{ name: "Canberra (Australia)", lat: -35.2, lon: 149.1 }, { name: "Port Moresby (PNG)", lat: -9.4, lon: 147.1 }],
+            "11": [{ name: "Honiara (Solomon Islands)", lat: -9.4, lon: 159.9 }, { name: "Port Vila (Vanuatu)", lat: -17.7, lon: 168.3 }],
+            "12": [{ name: "Wellington (New Zealand)", lat: -41.2, lon: 174.7 }, { name: "Suva (Fiji)", lat: -18.1, lon: 178.4 }],
+            "13": [{ name: "Nuku'alofa (Tonga)", lat: -21.1, lon: -175.2 }, { name: "Apia (Samoa)", lat: -13.8, lon: -171.7 }],
+            "14": [{ name: "Tarawa (Kiribati)", lat: 1.4, lon: 173.0 }]
         };
 
         let currentCities = [];
@@ -469,7 +485,13 @@
 
         function updateSliderUI() {
             const val = parseFloat(tzSlider.value);
-            const percent = ((val + 12) / 26) * 100;
+            
+            // Map the slider value perfectly to longitude: 15 degrees per UTC hour
+            let sliderLon = val * 15;
+            // Bound it slightly so the line doesn't go completely off-screen, 
+            // but normally longitude wraps around. We'll let it exceed for visual.
+            const percent = ((sliderLon + 180) / 360) * 100;
+            
             sliderLine.style.left = `${percent}%`;
             sliderLabel.style.left = `${percent}%`;
             
@@ -487,7 +509,7 @@
             }
 
             if (currentCities.length === 0) {
-                cityList.innerHTML = `<div style="padding: 10px; color: var(--text-muted);">No major cities tracked for UTC ${offsetLabel}</div>`;
+                cityList.innerHTML = `<div style="padding: 10px; color: var(--text-muted);">No major capitals tracked for UTC ${offsetLabel}</div>`;
             } else {
                 cityList.innerHTML = currentCities.map((city, idx) => `
                     <div class="city-item">
@@ -506,7 +528,16 @@
                 const el = document.getElementById(`city-time-${idx}`);
                 if (el) {
                     try {
-                        el.innerText = now.toLocaleTimeString('en-US', { timeZone: city.tz, hour12: false });
+                        const val = parseFloat(tzSlider.value);
+                        // Convert offset to UTC timezone offset mathematically
+                        const utcMs = now.getTime() + (now.getTimezoneOffset() * 60000);
+                        const cityTime = new Date(utcMs + (3600000 * val));
+                        
+                        // formatting manually as HH:MM:SS
+                        const h = String(cityTime.getHours()).padStart(2, '0');
+                        const m = String(cityTime.getMinutes()).padStart(2, '0');
+                        const s = String(cityTime.getSeconds()).padStart(2, '0');
+                        el.innerText = `${h}:${m}:${s}`;
                     } catch (e) {
                         el.innerText = 'N/A';
                     }
