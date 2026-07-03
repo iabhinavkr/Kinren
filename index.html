@@ -145,9 +145,33 @@
             margin-bottom: 20px;
         }
 
-        .world-map {
+        .world-map-bg {
             width: 100%;
             height: 100%;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg');
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .city-dot {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 0 0 2px white;
+            transition: all 0.2s;
+            z-index: 7;
+        }
+
+        .city-dot.active {
+            background-color: var(--danger);
+            transform: translate(-50%, -50%) scale(1.5);
+            box-shadow: 0 0 0 2px white, 0 0 8px var(--danger);
+            z-index: 8;
         }
 
         .timezone-slider {
@@ -288,14 +312,9 @@
         <div class="card" style="grid-column: 1 / -1;">
             <h2>Interactive World Clock</h2>
             <div class="map-container">
-                <svg viewBox="0 0 1000 500" class="world-map">
-                    <!-- Background Map Stylization -->
-                    <path d="M100,80 Q250,30 350,150 T200,280 Q80,200 100,80" fill="#cbd5e1" />
-                    <path d="M250,280 Q350,300 300,480 T200,350 Q220,300 250,280" fill="#cbd5e1" />
-                    <path d="M450,50 Q600,20 650,250 T480,450 Q380,250 450,50" fill="#cbd5e1" />
-                    <path d="M600,50 Q850,20 900,250 T650,280 Q550,100 600,50" fill="#cbd5e1" />
-                    <path d="M800,350 Q950,320 900,450 T750,450 Q750,350 800,350" fill="#cbd5e1" />
-                </svg>
+                <div class="world-map-bg">
+                    <div id="city-dots-container"></div>
+                </div>
                 
                 <div class="slider-line" id="slider-line" style="left: 50%;"></div>
                 <div class="slider-thumb-label" id="slider-label" style="left: 50%;">UTC 0</div>
@@ -402,37 +421,51 @@
         const cityList = document.getElementById('city-list');
 
         const cityDatabase = {
-            "-12": [{ name: "Baker Island", tz: "Etc/GMT+12" }],
-            "-11": [{ name: "Niue", tz: "Pacific/Niue" }],
-            "-10": [{ name: "Honolulu", tz: "Pacific/Honolulu" }],
-            "-9": [{ name: "Anchorage", tz: "America/Anchorage" }],
-            "-8": [{ name: "Los Angeles", tz: "America/Los_Angeles" }, { name: "Vancouver", tz: "America/Vancouver" }],
-            "-7": [{ name: "Denver", tz: "America/Denver" }, { name: "Phoenix", tz: "America/Phoenix" }],
-            "-6": [{ name: "Chicago", tz: "America/Chicago" }, { name: "Mexico City", tz: "America/Mexico_City" }],
-            "-5": [{ name: "New York", tz: "America/New_York" }, { name: "Toronto", tz: "America/Toronto" }, { name: "Bogota", tz: "America/Bogota" }],
-            "-4": [{ name: "Caracas", tz: "America/Caracas" }, { name: "Santiago", tz: "America/Santiago" }],
-            "-3": [{ name: "Buenos Aires", tz: "America/Buenos_Aires" }, { name: "Sao Paulo", tz: "America/Sao_Paulo" }],
-            "-2": [{ name: "South Georgia", tz: "Atlantic/South_Georgia" }],
-            "-1": [{ name: "Azores", tz: "Atlantic/Azores" }],
-            "0": [{ name: "London", tz: "Europe/London" }, { name: "Lisbon", tz: "Europe/Lisbon" }, { name: "Accra", tz: "Africa/Accra" }],
-            "1": [{ name: "Paris", tz: "Europe/Paris" }, { name: "Berlin", tz: "Europe/Berlin" }, { name: "Rome", tz: "Europe/Rome" }],
-            "2": [{ name: "Athens", tz: "Europe/Athens" }, { name: "Cairo", tz: "Africa/Cairo" }, { name: "Jerusalem", tz: "Asia/Jerusalem" }],
-            "3": [{ name: "Moscow", tz: "Europe/Moscow" }, { name: "Istanbul", tz: "Europe/Istanbul" }, { name: "Riyadh", tz: "Asia/Riyadh" }],
-            "4": [{ name: "Dubai", tz: "Asia/Dubai" }, { name: "Baku", tz: "Asia/Baku" }],
-            "5": [{ name: "Karachi", tz: "Asia/Karachi" }, { name: "Tashkent", tz: "Asia/Tashkent" }],
-            "5.5": [{ name: "New Delhi", tz: "Asia/Kolkata" }, { name: "Mumbai", tz: "Asia/Kolkata" }],
-            "6": [{ name: "Dhaka", tz: "Asia/Dhaka" }, { name: "Almaty", tz: "Asia/Almaty" }],
-            "7": [{ name: "Bangkok", tz: "Asia/Bangkok" }, { name: "Jakarta", tz: "Asia/Jakarta" }],
-            "8": [{ name: "Beijing", tz: "Asia/Shanghai" }, { name: "Singapore", tz: "Asia/Singapore" }, { name: "Hong Kong", tz: "Asia/Hong_Kong" }],
-            "9": [{ name: "Tokyo", tz: "Asia/Tokyo" }, { name: "Seoul", tz: "Asia/Seoul" }],
-            "10": [{ name: "Sydney", tz: "Australia/Sydney" }, { name: "Guam", tz: "Pacific/Guam" }],
-            "11": [{ name: "Solomon Islands", tz: "Pacific/Guadalcanal" }],
-            "12": [{ name: "Auckland", tz: "Pacific/Auckland" }, { name: "Fiji", tz: "Pacific/Fiji" }],
-            "13": [{ name: "Tonga", tz: "Pacific/Tongatapu" }],
-            "14": [{ name: "Kiribati (Line Is.)", tz: "Pacific/Kiritimati" }]
+            "-10": [{ name: "Honolulu", tz: "Pacific/Honolulu", lat: 21.3, lon: -157.8 }],
+            "-9": [{ name: "Anchorage", tz: "America/Anchorage", lat: 61.2, lon: -149.9 }],
+            "-8": [{ name: "Los Angeles", tz: "America/Los_Angeles", lat: 34.0, lon: -118.2 }],
+            "-7": [{ name: "Denver", tz: "America/Denver", lat: 39.7, lon: -104.9 }],
+            "-6": [{ name: "Chicago", tz: "America/Chicago", lat: 41.8, lon: -87.6 }, { name: "Mexico City", tz: "America/Mexico_City", lat: 19.4, lon: -99.1 }],
+            "-5": [{ name: "New York", tz: "America/New_York", lat: 40.7, lon: -74.0 }, { name: "Bogota", tz: "America/Bogota", lat: 4.7, lon: -74.0 }],
+            "-4": [{ name: "Santiago", tz: "America/Santiago", lat: -33.4, lon: -70.6 }],
+            "-3": [{ name: "Buenos Aires", tz: "America/Buenos_Aires", lat: -34.6, lon: -58.3 }, { name: "Sao Paulo", tz: "America/Sao_Paulo", lat: -23.5, lon: -46.6 }],
+            "0": [{ name: "London", tz: "Europe/London", lat: 51.5, lon: -0.1 }, { name: "Accra", tz: "Africa/Accra", lat: 5.6, lon: -0.2 }],
+            "1": [{ name: "Paris", tz: "Europe/Paris", lat: 48.8, lon: 2.3 }, { name: "Berlin", tz: "Europe/Berlin", lat: 52.5, lon: 13.4 }],
+            "2": [{ name: "Athens", tz: "Europe/Athens", lat: 37.9, lon: 23.7 }, { name: "Cairo", tz: "Africa/Cairo", lat: 30.0, lon: 31.2 }],
+            "3": [{ name: "Moscow", tz: "Europe/Moscow", lat: 55.7, lon: 37.6 }, { name: "Riyadh", tz: "Asia/Riyadh", lat: 24.7, lon: 46.7 }],
+            "4": [{ name: "Dubai", tz: "Asia/Dubai", lat: 25.2, lon: 55.3 }],
+            "5.5": [{ name: "New Delhi", tz: "Asia/Kolkata", lat: 28.6, lon: 77.2 }],
+            "7": [{ name: "Bangkok", tz: "Asia/Bangkok", lat: 13.7, lon: 100.5 }, { name: "Jakarta", tz: "Asia/Jakarta", lat: -6.2, lon: 106.8 }],
+            "8": [{ name: "Beijing", tz: "Asia/Shanghai", lat: 39.9, lon: 116.4 }, { name: "Singapore", tz: "Asia/Singapore", lat: 1.3, lon: 103.8 }],
+            "9": [{ name: "Tokyo", tz: "Asia/Tokyo", lat: 35.6, lon: 139.6 }, { name: "Seoul", tz: "Asia/Seoul", lat: 37.5, lon: 126.9 }],
+            "10": [{ name: "Sydney", tz: "Australia/Sydney", lat: -33.8, lon: 151.2 }],
+            "12": [{ name: "Auckland", tz: "Pacific/Auckland", lat: -36.8, lon: 174.7 }]
         };
 
         let currentCities = [];
+        let allCityElements = [];
+        const cityDotsContainer = document.getElementById('city-dots-container');
+
+        function initMapDots() {
+            Object.keys(cityDatabase).forEach(offset => {
+                cityDatabase[offset].forEach(city => {
+                    if (city.lat !== undefined && city.lon !== undefined) {
+                        const xPercent = ((city.lon + 180) / 360) * 100;
+                        const yPercent = ((90 - city.lat) / 180) * 100;
+
+                        const dot = document.createElement('div');
+                        dot.className = 'city-dot';
+                        dot.style.left = `${xPercent}%`;
+                        dot.style.top = `${yPercent}%`;
+                        dot.title = city.name;
+                        
+                        city.dotElement = dot;
+                        cityDotsContainer.appendChild(dot);
+                        allCityElements.push(dot);
+                    }
+                });
+            });
+        }
 
         function updateSliderUI() {
             const val = parseFloat(tzSlider.value);
@@ -446,6 +479,13 @@
 
             currentCities = cityDatabase[val.toString()] || [];
             
+            allCityElements.forEach(d => d.classList.remove('active'));
+            if (currentCities) {
+                currentCities.forEach(city => {
+                    if (city.dotElement) city.dotElement.classList.add('active');
+                });
+            }
+
             if (currentCities.length === 0) {
                 cityList.innerHTML = `<div style="padding: 10px; color: var(--text-muted);">No major cities tracked for UTC ${offsetLabel}</div>`;
             } else {
@@ -477,6 +517,7 @@
         tzSlider.addEventListener('input', updateSliderUI);
         
         // Initial setup
+        initMapDots();
         updateSliderUI();
         setInterval(updateCityClocks, 1000);
     </script>
