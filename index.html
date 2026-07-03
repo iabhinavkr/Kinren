@@ -131,6 +131,107 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
+        /* Map World Clock */
+        .map-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 300px;
+            background: #f8fafc;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .world-map {
+            width: 100%;
+            height: 100%;
+        }
+
+        .timezone-slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0; 
+            z-index: 10;
+            cursor: ew-resize;
+            margin: 0;
+        }
+
+        .slider-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--danger);
+            pointer-events: none;
+            z-index: 5;
+            transition: left 0.1s;
+        }
+
+        .slider-thumb-label {
+            position: absolute;
+            top: 10px;
+            transform: translateX(-50%);
+            background: var(--danger);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            pointer-events: none;
+            z-index: 6;
+            white-space: nowrap;
+        }
+
+        .city-info-panel {
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+        }
+
+        .city-info-panel h3 {
+            margin: 0 0 15px 0;
+            color: var(--primary);
+            font-size: 1.1rem;
+            text-transform: uppercase;
+        }
+
+        .city-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .city-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            min-width: 120px;
+        }
+
+        .city-item .city-name {
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .city-item .city-time {
+            font-family: monospace;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
     </style>
 </head>
 <!-- Blocks right-click contextual menus -->
@@ -180,6 +281,32 @@
                 <button id="t-start">Start</button>
                 <button id="t-pause" class="secondary">Pause</button>
                 <button id="t-reset" class="danger">Reset</button>
+            </div>
+        </div>
+
+        <!-- 5. World Clock (Interactive Map) -->
+        <div class="card" style="grid-column: 1 / -1;">
+            <h2>Interactive World Clock</h2>
+            <div class="map-container">
+                <svg viewBox="0 0 1000 500" class="world-map">
+                    <!-- Background Map Stylization -->
+                    <path d="M100,80 Q250,30 350,150 T200,280 Q80,200 100,80" fill="#cbd5e1" />
+                    <path d="M250,280 Q350,300 300,480 T200,350 Q220,300 250,280" fill="#cbd5e1" />
+                    <path d="M450,50 Q600,20 650,250 T480,450 Q380,250 450,50" fill="#cbd5e1" />
+                    <path d="M600,50 Q850,20 900,250 T650,280 Q550,100 600,50" fill="#cbd5e1" />
+                    <path d="M800,350 Q950,320 900,450 T750,450 Q750,350 800,350" fill="#cbd5e1" />
+                </svg>
+                
+                <div class="slider-line" id="slider-line" style="left: 50%;"></div>
+                <div class="slider-thumb-label" id="slider-label" style="left: 50%;">UTC 0</div>
+                <input type="range" min="-12" max="14" step="0.5" value="0" class="timezone-slider" id="tz-slider">
+            </div>
+
+            <div class="city-info-panel">
+                <h3 id="tz-title">Timezone: UTC 0</h3>
+                <div class="city-list" id="city-list">
+                    <!-- Dynamic Cities will appear here -->
+                </div>
             </div>
         </div>
     </div>
@@ -266,6 +393,92 @@
             clearInterval(tTimer); tRunning = false; tTotalSeconds = 0; updateTDisplay();
             document.getElementById('t-hours').value = ''; document.getElementById('t-minutes').value = ''; document.getElementById('t-seconds').value = '';
         });
+
+        // --- 5. INTERACTIVE WORLD CLOCK ---
+        const tzSlider = document.getElementById('tz-slider');
+        const sliderLine = document.getElementById('slider-line');
+        const sliderLabel = document.getElementById('slider-label');
+        const tzTitle = document.getElementById('tz-title');
+        const cityList = document.getElementById('city-list');
+
+        const cityDatabase = {
+            "-12": [{ name: "Baker Island", tz: "Etc/GMT+12" }],
+            "-11": [{ name: "Niue", tz: "Pacific/Niue" }],
+            "-10": [{ name: "Honolulu", tz: "Pacific/Honolulu" }],
+            "-9": [{ name: "Anchorage", tz: "America/Anchorage" }],
+            "-8": [{ name: "Los Angeles", tz: "America/Los_Angeles" }, { name: "Vancouver", tz: "America/Vancouver" }],
+            "-7": [{ name: "Denver", tz: "America/Denver" }, { name: "Phoenix", tz: "America/Phoenix" }],
+            "-6": [{ name: "Chicago", tz: "America/Chicago" }, { name: "Mexico City", tz: "America/Mexico_City" }],
+            "-5": [{ name: "New York", tz: "America/New_York" }, { name: "Toronto", tz: "America/Toronto" }, { name: "Bogota", tz: "America/Bogota" }],
+            "-4": [{ name: "Caracas", tz: "America/Caracas" }, { name: "Santiago", tz: "America/Santiago" }],
+            "-3": [{ name: "Buenos Aires", tz: "America/Buenos_Aires" }, { name: "Sao Paulo", tz: "America/Sao_Paulo" }],
+            "-2": [{ name: "South Georgia", tz: "Atlantic/South_Georgia" }],
+            "-1": [{ name: "Azores", tz: "Atlantic/Azores" }],
+            "0": [{ name: "London", tz: "Europe/London" }, { name: "Lisbon", tz: "Europe/Lisbon" }, { name: "Accra", tz: "Africa/Accra" }],
+            "1": [{ name: "Paris", tz: "Europe/Paris" }, { name: "Berlin", tz: "Europe/Berlin" }, { name: "Rome", tz: "Europe/Rome" }],
+            "2": [{ name: "Athens", tz: "Europe/Athens" }, { name: "Cairo", tz: "Africa/Cairo" }, { name: "Jerusalem", tz: "Asia/Jerusalem" }],
+            "3": [{ name: "Moscow", tz: "Europe/Moscow" }, { name: "Istanbul", tz: "Europe/Istanbul" }, { name: "Riyadh", tz: "Asia/Riyadh" }],
+            "4": [{ name: "Dubai", tz: "Asia/Dubai" }, { name: "Baku", tz: "Asia/Baku" }],
+            "5": [{ name: "Karachi", tz: "Asia/Karachi" }, { name: "Tashkent", tz: "Asia/Tashkent" }],
+            "5.5": [{ name: "New Delhi", tz: "Asia/Kolkata" }, { name: "Mumbai", tz: "Asia/Kolkata" }],
+            "6": [{ name: "Dhaka", tz: "Asia/Dhaka" }, { name: "Almaty", tz: "Asia/Almaty" }],
+            "7": [{ name: "Bangkok", tz: "Asia/Bangkok" }, { name: "Jakarta", tz: "Asia/Jakarta" }],
+            "8": [{ name: "Beijing", tz: "Asia/Shanghai" }, { name: "Singapore", tz: "Asia/Singapore" }, { name: "Hong Kong", tz: "Asia/Hong_Kong" }],
+            "9": [{ name: "Tokyo", tz: "Asia/Tokyo" }, { name: "Seoul", tz: "Asia/Seoul" }],
+            "10": [{ name: "Sydney", tz: "Australia/Sydney" }, { name: "Guam", tz: "Pacific/Guam" }],
+            "11": [{ name: "Solomon Islands", tz: "Pacific/Guadalcanal" }],
+            "12": [{ name: "Auckland", tz: "Pacific/Auckland" }, { name: "Fiji", tz: "Pacific/Fiji" }],
+            "13": [{ name: "Tonga", tz: "Pacific/Tongatapu" }],
+            "14": [{ name: "Kiribati (Line Is.)", tz: "Pacific/Kiritimati" }]
+        };
+
+        let currentCities = [];
+
+        function updateSliderUI() {
+            const val = parseFloat(tzSlider.value);
+            const percent = ((val + 12) / 26) * 100;
+            sliderLine.style.left = `${percent}%`;
+            sliderLabel.style.left = `${percent}%`;
+            
+            const offsetLabel = val > 0 ? `+${val}` : `${val}`;
+            sliderLabel.innerText = `UTC ${offsetLabel}`;
+            tzTitle.innerText = `Timezone: UTC ${offsetLabel}`;
+
+            currentCities = cityDatabase[val.toString()] || [];
+            
+            if (currentCities.length === 0) {
+                cityList.innerHTML = `<div style="padding: 10px; color: var(--text-muted);">No major cities tracked for UTC ${offsetLabel}</div>`;
+            } else {
+                cityList.innerHTML = currentCities.map((city, idx) => `
+                    <div class="city-item">
+                        <div class="city-name">${city.name}</div>
+                        <div class="city-time" id="city-time-${idx}">--:--:--</div>
+                    </div>
+                `).join('');
+            }
+            updateCityClocks();
+        }
+
+        function updateCityClocks() {
+            if (!currentCities || currentCities.length === 0) return;
+            const now = new Date();
+            currentCities.forEach((city, idx) => {
+                const el = document.getElementById(`city-time-${idx}`);
+                if (el) {
+                    try {
+                        el.innerText = now.toLocaleTimeString('en-US', { timeZone: city.tz, hour12: false });
+                    } catch (e) {
+                        el.innerText = 'N/A';
+                    }
+                }
+            });
+        }
+
+        tzSlider.addEventListener('input', updateSliderUI);
+        
+        // Initial setup
+        updateSliderUI();
+        setInterval(updateCityClocks, 1000);
     </script>
 </body>
 </html>
