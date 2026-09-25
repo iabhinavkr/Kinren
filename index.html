@@ -669,7 +669,7 @@
         }
 
         /* ============================================================
-           SATELLITE EQUAL-AREA WORLD CLOCK SECTION
+           SATELLITE WORLD CLOCK SECTION
         ============================================================ */
         .world-clock-card {
             padding: 30px 24px;
@@ -1406,24 +1406,24 @@
         </div>
 
         <!-- ============================================================
-             3. INTERACTIVE WORLD CLOCK & EQUAL-AREA SATELLITE MAP
+             3. INTERACTIVE WORLD CLOCK & SATELLITE MAP
         ============================================================ -->
         <div class="card world-clock-card">
             <div class="map-header-controls">
                 <div>
-                    <h2 class="card-title" style="font-size: 1.05rem; margin-bottom: 4px;">🌍 Satellite Equal-Area World Clock</h2>
+                    <h2 class="card-title" style="font-size: 1.05rem; margin-bottom: 4px;">🌍 Satellite World Clock</h2>
                     <div class="proj-badge-note" id="projection-description">
-                        Showing Equal Earth Projection (Area-preserving pseudocylindrical NASA Blue Marble satellite view)
+                        Showing Equal Earth Projection (Pseudocylindrical NASA Blue Marble satellite view)
                     </div>
                 </div>
 
                 <!-- Projection Selector Switch -->
                 <div class="projection-pill-group">
-                    <button class="proj-btn active" id="btn-proj-equal-earth" title="Equal Earth Equal-Area Projection">
-                        <span>🌍</span> Equal Earth (Equal Area)
+                    <button class="proj-btn active" id="btn-proj-equal-earth" title="Equal Earth Projection">
+                        <span>🌍</span> Equal Earth
                     </button>
-                    <button class="proj-btn" id="btn-proj-gall-peters" title="Gall–Peters Cylindrical Equal-Area Projection">
-                        <span>🌐</span> Gall–Peters (Equal Area)
+                    <button class="proj-btn" id="btn-proj-gall-peters" title="Gall–Peters Cylindrical Projection">
+                        <span>🌐</span> Gall–Peters
                     </button>
                 </div>
 
@@ -2374,7 +2374,7 @@
         }
 
         // ============================================================
-        // 5. CARTOGRAPHIC EQUAL-AREA PROJECTION ENGINE
+        // 5. CARTOGRAPHIC PROJECTION ENGINE
         // ============================================================
         let currentProjection = 'equal-earth';
 
@@ -2401,7 +2401,7 @@
             return { x: pctX, y: pctY };
         }
 
-        // Gall–Peters Cylindrical Equal-Area Forward Equations
+        // Gall–Peters Cylindrical Forward Equations
         function projectGallPeters(lon, lat) {
             const pctX = ((lon + 180) / 360) * 100;
             const pctY = (0.5 - Math.sin(lat * Math.PI / 180) / 2) * 100;
@@ -2432,13 +2432,13 @@
                 btnGallPeters.classList.remove('active');
                 mapAspectContainer.classList.remove('gall-peters');
                 satelliteBg.style.backgroundImage = `url('${SATELLITE_IMAGES['equal-earth']}')`;
-                projDesc.innerText = "Equal Earth Projection (Area-preserving pseudocylindrical NASA Blue Marble satellite view)";
+                projDesc.innerText = "Equal Earth Projection (Pseudocylindrical NASA Blue Marble satellite view)";
             } else {
                 btnGallPeters.classList.add('active');
                 btnEqualEarth.classList.remove('active');
                 mapAspectContainer.classList.add('gall-peters');
                 satelliteBg.style.backgroundImage = `url('${SATELLITE_IMAGES['gall-peters']}')`;
-                projDesc.innerText = "Gall–Peters Projection (Cylindrical equal-area NASA Blue Marble satellite view)";
+                projDesc.innerText = "Gall–Peters Projection (Cylindrical NASA Blue Marble satellite view)";
             }
             updateCityMarkerPositions();
             drawTimezoneOverlay();
