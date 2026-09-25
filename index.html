@@ -2788,6 +2788,13 @@
             });
         }
 
+        // Real-time synchronization across browser tabs
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'kinren-theme' && e.newValue) {
+                applyTheme(e.newValue);
+            }
+        });
+
         // Initialize Map
         setProjection('equal-earth');
         initMapCityDots();
