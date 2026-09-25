@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, follow">
+    <title>404 - Lost in Coordinates | Time Dashboard</title>
+    <script>
+        (function() {
+            try {
+                var theme = localStorage.getItem('kinren-theme');
+                if (theme === 'light') {
+                    document.documentElement.setAttribute('data-theme', 'light');
+                }
+            } catch (e) {}
+        })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Dark Theme (Default) */
+            --bg-color: #0b0f17;
+            --card-bg: #141b26;
+            --card-border: #232f3e;
+            --card-border-hover: #38bdf8;
+            --primary: #38bdf8;
+            --primary-glow: rgba(56, 189, 248, 0.35);
+            --secondary: #34d399;
+            --accent: #fbbf24;
+            --danger: #f43f5e;
+            --purple: #a78bfa;
+            --text-main: #f1f5f9;
+            --text-muted: #94a3b8;
+            --inner-bg: #0d121c;
+            --input-bg: #0f172a;
+            --chip-bg: #1e293b;
+            --chip-text: #cbd5e1;
+            --track-bg: #1e293b;
+            --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+            --header-bg: #141b26;
+            --header-border: #232f3e;
+            --panel-grad: linear-gradient(135deg, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+            --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        [data-theme="light"] {
+            /* Elegant Peach & Porcelain Cream Light Theme */
+            --bg-color: #f7ebe1;
+            --card-bg: #fff8f3;
+            --card-border: #e6cebd;
+            --card-border-hover: #0284c7;
+            --primary: #0284c7;
+            --primary-glow: rgba(2, 132, 199, 0.25);
+            --secondary: #059669;
+            --accent: #d97706;
+            --danger: #e11d48;
+            --purple: #7c3aed;
+            --text-main: #2b1a15;
+            --text-muted: #785a4f;
+            --inner-bg: #f4e3d5;
+            --input-bg: #fffcf9;
+            --chip-bg: #f2decfa0;
+            --chip-text: #3d2319;
+            --track-bg: #e8d2c2;
+            --card-shadow: 0 8px 24px rgba(138, 79, 44, 0.08);
+            --header-bg: #fff8f3;
+            --header-border: #e6cebd;
+            --panel-grad: linear-gradient(135deg, #fff9f5 0%, #f7ebe1 100%);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 0 0 60px 0;
+            color: var(--text-main);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Top App Header matching index.html */
+        .app-header {
+            background: var(--header-bg);
+            border-bottom: 1px solid var(--header-border);
+            padding: 14px 24px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .brand-icon {
+            font-size: 1.7rem;
+        }
+
+        .brand-title {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: var(--text-main);
+            letter-spacing: -0.5px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .theme-toggle-btn {
+            background: var(--chip-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            width: 38px;
+            height: 38px;
+            padding: 0;
+            border-radius: 50%;
+            font-size: 1.15rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
+        }
+
+        .theme-toggle-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-1px) scale(1.08);
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        .back-home-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-size: 0.86rem;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 8px;
+            background: var(--chip-bg);
+            border: 1px solid var(--card-border);
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .back-home-link:hover {
+            border-color: var(--primary);
+            transform: translateY(-1px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+        }
+
+        /* 404 Hero Section with Visual Graphic */
+        .hero-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--card-shadow);
+        }
+
+        .graphic-wrapper {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 20px auto;
+        }
+
+        .globe-svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 25px var(--primary-glow));
+            animation: floatGlobe 6s ease-in-out infinite;
+        }
+
+        @keyframes floatGlobe {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-8px) rotate(3deg); }
+        }
+
+        .orbit-ring {
+            transform-origin: center;
+            animation: spinRing 20s linear infinite;
+        }
+
+        @keyframes spinRing {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .pulse-pin {
+            transform-origin: center;
+            animation: pulseBeacon 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseBeacon {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.6); opacity: 0.4; }
+        }
+
+        .error-code {
+            font-family: var(--font-mono);
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1;
+            letter-spacing: -2px;
+            color: var(--primary);
+            text-shadow: 0 0 30px var(--primary-glow);
+            margin: 0 0 8px 0;
+        }
+
+        .error-tagline {
+            font-size: 1.45rem;
+            font-weight: 800;
+            margin: 0 0 10px 0;
+            color: var(--text-main);
+        }
+
+        .error-desc {
+            max-width: 580px;
+            margin: 0 auto 24px auto;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .coords-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--inner-bg);
+            border: 1px solid var(--card-border);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-family: var(--font-mono);
+            font-size: 0.82rem;
+            color: var(--accent);
+            margin-bottom: 24px;
+        }
+
+        .cta-row {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 22px;
+            border-radius: 10px;
+            font-size: 0.92rem;
+            font-weight: 700;
+            font-family: var(--font-main);
+            text-decoration: none;
+            cursor: pointer;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: #0284c7;
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(2, 132, 199, 0.35);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .btn-secondary {
+            background: var(--chip-bg);
+            border-color: var(--card-border);
+            color: var(--text-main);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        /* 2-Column Section: Trivia & Quiz */
+        .interactive-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        @media (max-width: 860px) {
+            .interactive-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: var(--card-shadow);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 0.92rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-badge {
+            background: var(--chip-bg);
+            border: 1px solid var(--card-border);
+            color: var(--primary);
+            font-family: var(--font-mono);
+            font-size: 0.76rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 12px;
+        }
+
+        /* Trivia Section */
+        .fact-display-box {
+            background: var(--inner-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 24px 20px;
+            min-height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .fact-category {
+            font-size: 0.78rem;
+            font-family: var(--font-mono);
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .fact-quote {
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--text-main);
+            line-height: 1.55;
+            margin: 0;
+        }
+
+        .fact-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 18px;
+            gap: 10px;
+        }
+
+        /* Geography Quiz Section */
+        .quiz-box {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .quiz-question-box {
+            background: var(--inner-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 18px;
+            font-size: 0.98rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.45;
+            min-height: 72px;
+            display: flex;
+            align-items: center;
+        }
+
+        .quiz-options-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 500px) {
+            .quiz-options-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .quiz-option-btn {
+            background: var(--inner-bg);
+            border: 1px solid var(--card-border);
+            color: var(--text-main);
+            padding: 12px 14px;
+            border-radius: 10px;
+            font-family: var(--font-main);
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.18s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .quiz-option-btn:hover:not(:disabled) {
+            border-color: var(--primary);
+            background: var(--chip-bg);
+            transform: translateY(-1px);
+        }
+
+        .quiz-option-btn.correct {
+            background: rgba(16, 185, 129, 0.15) !important;
+            border-color: #10b981 !important;
+            color: #059669 !important;
+            font-weight: 700;
+        }
+
+        .quiz-option-btn.wrong {
+            background: rgba(239, 68, 68, 0.15) !important;
+            border-color: #ef4444 !important;
+            color: #e11d48 !important;
+            font-weight: 700;
+        }
+
+        .quiz-feedback-row {
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .feedback-text {
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .feedback-text.correct-msg {
+            color: #059669;
+        }
+
+        .feedback-text.wrong-msg {
+            color: #e11d48;
+        }
+
+        .streak-tag {
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
+            background: var(--chip-bg);
+            padding: 4px 10px;
+            border-radius: 8px;
+            color: var(--accent);
+            border: 1px solid var(--card-border);
+            white-space: nowrap;
+        }
+
+        /* Footer */
+        .footer-note {
+            text-align: center;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <!-- Top Header -->
+    <header class="app-header">
+        <div class="header-content">
+            <a href="index.html" class="header-brand" title="Return to Time Dashboard">
+                <span class="brand-icon">🌐</span>
+                <h1 class="brand-title">Time Dashboard</h1>
+            </a>
+            <div class="header-actions">
+                <button class="theme-toggle-btn" id="theme-toggle" aria-label="Toggle Light and Dark Theme" title="Toggle Light / Dark Theme">
+                    <span class="theme-icon" id="theme-icon">☀️</span>
+                </button>
+                <a href="index.html" class="back-home-link" title="Back to Time Dashboard">
+                    <span>⏱️</span> Return to Dashboard
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        
+        <!-- 404 Hero Section with Animated Cartographic Graphic -->
+        <section class="hero-card">
+            <div class="graphic-wrapper">
+                <svg class="globe-svg" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <radialGradient id="globeGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.35"/>
+                            <stop offset="70%" stop-color="#0284c7" stop-opacity="0.12"/>
+                            <stop offset="100%" stop-color="#0f172a" stop-opacity="0.0"/>
+                        </radialGradient>
+                        <linearGradient id="ringGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#38bdf8" stop-opacity="0.8"/>
+                            <stop offset="50%" stop-color="#a78bfa" stop-opacity="0.4"/>
+                            <stop offset="100%" stop-color="#34d399" stop-opacity="0.9"/>
+                        </linearGradient>
+                    </defs>
+
+                    <!-- Background Glow Sphere -->
+                    <circle cx="100" cy="100" r="76" fill="url(#globeGrad)" />
+                    <circle cx="100" cy="100" r="76" stroke="var(--primary)" stroke-width="1.8" stroke-dasharray="4 3" opacity="0.6"/>
+
+                    <!-- Meridian Curves -->
+                    <ellipse cx="100" cy="100" rx="38" ry="76" stroke="var(--primary)" stroke-width="1.2" opacity="0.45"/>
+                    <ellipse cx="100" cy="100" rx="64" ry="76" stroke="var(--primary)" stroke-width="0.8" opacity="0.3"/>
+                    <line x1="100" y1="24" x2="100" y2="176" stroke="var(--primary)" stroke-width="1.5" opacity="0.7"/>
+
+                    <!-- Parallel Latitude Curves -->
+                    <line x1="24" y1="100" x2="176" y2="100" stroke="var(--accent)" stroke-width="1.5" stroke-dasharray="3 2" opacity="0.8"/>
+                    <ellipse cx="100" cy="65" rx="66" ry="16" stroke="var(--primary)" stroke-width="1" opacity="0.35"/>
+                    <ellipse cx="100" cy="135" rx="66" ry="16" stroke="var(--primary)" stroke-width="1" opacity="0.35"/>
+
+                    <!-- Orbiting Coordinate Ring -->
+                    <g class="orbit-ring">
+                        <ellipse cx="100" cy="100" rx="90" ry="34" stroke="url(#ringGrad)" stroke-width="2" transform="rotate(-25 100 100)"/>
+                        <circle cx="178" cy="65" r="4.5" fill="#34d399" />
+                        <circle cx="22" cy="135" r="3.5" fill="#a78bfa" />
+                    </g>
+
+                    <!-- Center Lost Pin with Pulse Radar -->
+                    <g transform="translate(100, 100)">
+                        <circle class="pulse-pin" cx="0" cy="0" r="10" stroke="#f43f5e" stroke-width="2" fill="none"/>
+                        <circle cx="0" cy="0" r="4.5" fill="#f43f5e"/>
+                        <path d="M0 -14 L4 -5 L-4 -5 Z" fill="#f43f5e"/>
+                    </g>
+                </svg>
+            </div>
+
+            <div class="error-code">404</div>
+            <h2 class="error-tagline">Lost in World Coordinates</h2>
+            <div class="coords-badge">
+                <span>📍</span> Lat 40.4000° N • Long 40.4000° W • Uncharted Territory
+            </div>
+            <p class="error-desc">
+                The meridian you navigated to does not exist on this cartographic projection. While we calibrate your compass, explore fascinating world geography trivia or test your skills in the quick quiz below!
+            </p>
+
+            <div class="cta-row">
+                <a href="index.html" class="btn btn-primary">
+                    <span>⏱️</span> Open Time Dashboard
+                </a>
+                <button class="btn btn-secondary" onclick="generateRandomFact()">
+                    <span>🎲</span> New Geography Fact
+                </button>
+            </div>
+        </section>
+
+        <!-- 2-Column Section: Trivia & Facts + Geography Quiz -->
+        <div class="interactive-grid">
+            
+            <!-- World Geography Trivia & Facts -->
+            <div class="card">
+                <div>
+                    <div class="card-header">
+                        <h3 class="card-title"><span>🌍</span> Geography Trivia &amp; Facts</h3>
+                        <span class="card-badge" id="fact-counter">Fact 1 of 20</span>
+                    </div>
+
+                    <div class="fact-display-box" id="fact-box">
+                        <div class="fact-category" id="fact-category">🕒 Timezone Curiosities</div>
+                        <p class="fact-quote" id="fact-text">
+                            France spans 12 different time zones across its mainland and overseas territories—more than any other sovereign nation on Earth!
+                        </p>
+                    </div>
+                </div>
+
+                <div class="fact-actions">
+                    <button class="btn btn-secondary" style="padding:7px 14px; font-size:0.84rem;" onclick="copyFactToClipboard()">
+                        <span id="copy-btn-icon">📋</span> <span id="copy-btn-text">Copy Fact</span>
+                    </button>
+                    <button class="btn btn-primary" style="padding:7px 16px; font-size:0.84rem;" onclick="generateRandomFact()">
+                        <span>🎲</span> Next Fact
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Geography & Timezone Quiz -->
+            <div class="card">
+                <div>
+                    <div class="card-header">
+                        <h3 class="card-title"><span>🧠</span> Geography Mini-Quiz</h3>
+                        <div class="streak-tag" id="score-tracker">Score: 0 | Streak: 0 🔥</div>
+                    </div>
+
+                    <div class="quiz-box">
+                        <div class="quiz-question-box" id="quiz-question">
+                            Loading quiz question...
+                        </div>
+
+                        <div class="quiz-options-list" id="quiz-options">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-feedback-row">
+                    <div class="feedback-text" id="quiz-feedback">Select an answer above!</div>
+                    <button class="btn btn-secondary" id="next-question-btn" style="padding:6px 14px; font-size:0.82rem; display:none;" onclick="loadNextQuestion()">
+                        Next Question ➔
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="footer-note">
+            Kinren Time Dashboard • Precision World Time, Equal-Area Cartography &amp; Cartographic Exploration
+        </div>
+
+    </div>
+
+    <script>
+        // ============================================================
+        // THEME SWITCHER (Light / Dark)
+        // ============================================================
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            try {
+                localStorage.setItem('kinren-theme', theme);
+            } catch (e) {}
+            if (themeIcon) {
+                themeIcon.textContent = theme === 'light' ? '🌙' : '☀️';
+            }
+            if (themeToggleBtn) {
+                const label = theme === 'light' ? 'Switch to Dark Mode' : 'Switch to Light Mode';
+                themeToggleBtn.setAttribute('title', label);
+                themeToggleBtn.setAttribute('aria-label', label);
+            }
+        }
+
+        let initialTheme = 'dark';
+        try {
+            initialTheme = localStorage.getItem('kinren-theme') || 'dark';
+        } catch (e) {
+            initialTheme = 'dark';
+        }
+        applyTheme(initialTheme);
+
+        if (themeToggleBtn) {
+            themeToggleBtn.addEventListener('click', () => {
+                const current = document.documentElement.getAttribute('data-theme') || 'dark';
+                applyTheme(current === 'dark' ? 'light' : 'dark');
+            });
+        }
+
+        // ============================================================
+        // GEOGRAPHY TRIVIA & FACTS DATASET
+        // ============================================================
+        const geographyFacts = [
+            {
+                category: "🕒 Timezone Curiosities",
+                text: "France spans 12 different time zones across its mainland and overseas territories (from French Polynesia to Réunion)—more than Russia (11) or the USA (11)!"
+            },
+            {
+                category: "🌊 Oceanic Geography",
+                text: "Point Nemo in the South Pacific is the most remote location on Earth. When you stand there, the closest humans are often the astronauts orbiting 400 km overhead on the ISS!"
+            },
+            {
+                category: "🌐 Border Anomalies",
+                text: "The Diomede Islands in the Bering Strait are just 3.8 km (2.4 miles) apart, yet Big Diomede (Russia) is 21 hours ahead of Little Diomede (USA) across the International Date Line!"
+            },
+            {
+                category: "⛰️ Earth Superlatives",
+                text: "Because the Earth bulges at the equator, Mount Chimborazo in Ecuador is the closest place on the Earth's surface to the stars, beating Mount Everest from the Earth's center by over 2 km!"
+            },
+            {
+                category: "🕒 Timezone Leap",
+                text: "In 1995, the island nation of Kiribati unilaterally moved the International Date Line 1,000 miles eastwards so its 33 dispersed islands could celebrate the same calendar day simultaneously."
+            },
+            {
+                category: "🌍 Unique Enclaves",
+                text: "Lesotho is the only independent country on Earth whose entire territory lies above 1,000 meters (3,280 ft) in elevation. Its lowest elevation point is 1,400 meters!"
+            },
+            {
+                category: "🗺️ Border Curiosities",
+                text: "Between Spain and Portugal exists the world's only cross-border zip-line (LimiteZero). Riding it across the Guadiana River lets you travel into another international timezone in just 60 seconds!"
+            },
+            {
+                category: "🏜️ Continental Extremes",
+                text: "Antarctica is technically the world's largest desert, receiving less than 50 mm (2 inches) of precipitation per year in its interior—far less than the Sahara!"
+            },
+            {
+                category: "🕒 Fractional Timezones",
+                text: "Nepal uses UTC+5:45 as its standard time offset, based on the meridian of Mount Gauri Sankar, making it one of only three places on Earth with a 45-minute fractional timezone."
+            },
+            {
+                category: "🏝️ Island Geographies",
+                text: "Nauru is the only sovereign republic in the world without an official designated capital city. The government offices are concentrated in the Yaren District."
+            },
+            {
+                category: "🌊 Water Wonders",
+                text: "Lake Baikal in Siberia contains roughly 20% of the world's unfrozen surface fresh water—more water than all five North American Great Lakes combined!"
+            },
+            {
+                category: "🌐 International Boundaries",
+                text: "Canada and Denmark amicably ended the 'Whisky War' in 2022 by dividing tiny uninhabited Hans Island in the Arctic, giving Canada its only land border with Europe!"
+            },
+            {
+                category: "🏙️ Capital Extremes",
+                text: "La Paz in Bolivia sits at an average altitude of 3,640 meters (11,942 ft), making it the highest administrative capital on Earth, where water boils at only 88°C (190°F)."
+            },
+            {
+                category: "🕒 Single Timezone Scale",
+                text: "China spans five geographical time zones from Xinjiang to Heilongjiang, but has operated strictly on a single timezone (Beijing Time, UTC+8) since 1949."
+            },
+            {
+                category: "🗺️ Geographic Centers",
+                text: "Istanbul, Turkey is the only metropolis in the world located across two continents (Europe and Asia), connected by iconic suspension bridges across the Bosphorus Strait."
+            },
+            {
+                category: "🌋 Volcanic Frontiers",
+                text: "Iceland is expanding by about 2.5 centimeters each year because it straddles the divergent boundary between the North American and Eurasian tectonic plates."
+            },
+            {
+                category: "🕒 Daylight Shift",
+                text: "Because Spain chose to align its clocks with Central European Time (CET) in 1940 rather than Greenwich Mean Time (GMT), summer sunsets in Galicia can occur past 10:15 PM!"
+            },
+            {
+                category: "🏝️ Coastal Extremes",
+                text: "Canada has the longest coastline in the world, stretching over 202,080 kilometers (125,567 miles). Walking it non-stop would take more than 30 years!"
+            },
+            {
+                category: "🏜️ Arid Marvels",
+                text: "Parts of the Atacama Desert in Chile have recorded zero rainfall for over 400 consecutive years, and NASA uses it to test Mars rovers due to its hyper-arid Martian soil."
+            },
+            {
+                category: "🌐 Zero Coordinate",
+                text: "Null Island is the nickname for the point at 0°N 0°E in the Gulf of Guinea where the Equator crosses the Prime Meridian. It is marked in reality only by a weather buoy!"
+            }
+        ];
+
+        let currentFactIndex = 0;
+
+        function displayFact(index) {
+            currentFactIndex = index;
+            const fact = geographyFacts[index];
+            const factBox = document.getElementById('fact-box');
+            factBox.style.opacity = '0';
+            factBox.style.transform = 'translateY(6px)';
+
+            setTimeout(() => {
+                document.getElementById('fact-category').innerText = fact.category;
+                document.getElementById('fact-text').innerText = fact.text;
+                document.getElementById('fact-counter').innerText = `Fact ${index + 1} of ${geographyFacts.length}`;
+                factBox.style.opacity = '1';
+                factBox.style.transform = 'translateY(0)';
+            }, 180);
+        }
+
+        function generateRandomFact() {
+            let nextIndex = Math.floor(Math.random() * geographyFacts.length);
+            if (nextIndex === currentFactIndex) {
+                nextIndex = (currentFactIndex + 1) % geographyFacts.length;
+            }
+            displayFact(nextIndex);
+        }
+
+        function copyFactToClipboard() {
+            const fact = geographyFacts[currentFactIndex];
+            const textToCopy = `${fact.category}: "${fact.text}" — via Kinren Time Dashboard`;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const btnIcon = document.getElementById('copy-btn-icon');
+                const btnText = document.getElementById('copy-btn-text');
+                btnIcon.innerText = '✅';
+                btnText.innerText = 'Copied!';
+                setTimeout(() => {
+                    btnIcon.innerText = '📋';
+                    btnText.innerText = 'Copy Fact';
+                }, 2000);
+            });
+        }
+
+        // ============================================================
+        // INTERACTIVE GEOGRAPHY QUIZ SYSTEM
+        // ============================================================
+        const quizQuestions = [
+            {
+                question: "Which sovereign nation spans the highest number of time zones worldwide?",
+                options: ["Russia", "France", "United States", "China"],
+                answer: 1,
+                explanation: "France has 12 time zones across its mainland and overseas territories around the globe!"
+            },
+            {
+                question: "What is standard time offset of Nepal relative to UTC?",
+                options: ["UTC+5:00", "UTC+5:30", "UTC+5:45", "UTC+6:00"],
+                answer: 2,
+                explanation: "Nepal uses UTC+5:45, centered on Mount Gauri Sankar's meridian."
+            },
+            {
+                question: "Which city is the only transcontinental metropolis spanning both Europe and Asia?",
+                options: ["Cairo", "Istanbul", "Tbilisi", "Baku"],
+                answer: 1,
+                explanation: "Istanbul is split between Europe and Asia by the Bosphorus Strait."
+            },
+            {
+                question: "What is the nickname for coordinate intersection 0°N, 0°E?",
+                options: ["Null Island", "Prime Point", "Equator Rock", "Meridian Isle"],
+                answer: 0,
+                explanation: "Null Island is a fictional point in the Gulf of Guinea where the Prime Meridian meets the Equator."
+            },
+            {
+                question: "Which is the highest administrative capital city in the world?",
+                options: ["Quito, Ecuador", "Bogotá, Colombia", "La Paz, Bolivia", "Thimphu, Bhutan"],
+                answer: 2,
+                explanation: "La Paz sits at approximately 3,640 meters (11,942 ft) above sea level."
+            },
+            {
+                question: "How many official time zones does China use across its entire territory?",
+                options: ["5", "3", "1", "4"],
+                answer: 2,
+                explanation: "China operates on a single unified timezone: Beijing Time (UTC+8)."
+            },
+            {
+                question: "Which is the largest desert on Earth by land area?",
+                options: ["Sahara Desert", "Arabian Desert", "Antarctic Desert", "Gobi Desert"],
+                answer: 2,
+                explanation: "Antarctica is classified as a polar desert and covers 14.2 million sq km!"
+            },
+            {
+                question: "Which country has the longest total coastline in the world?",
+                options: ["Indonesia", "Australia", "Canada", "Norway"],
+                answer: 2,
+                explanation: "Canada's coastline stretches over 202,080 km (125,567 miles)."
+            },
+            {
+                question: "Between which two nations is the international 'Whisky War' over Hans Island?",
+                options: ["Canada & Denmark", "UK & France", "USA & Russia", "Norway & Sweden"],
+                answer: 0,
+                explanation: "Canada and Denmark amicably split Hans Island in 2022, creating a land border."
+            },
+            {
+                question: "Point Nemo in the South Pacific is notable for being what?",
+                options: ["Deepest ocean trench", "Oceanic pole of inaccessibility", "Largest coral reef", "Southernmost coral island"],
+                answer: 1,
+                explanation: "Point Nemo is the furthest point in the ocean from any land on Earth."
+            }
+        ];
+
+        let currentQuestionIdx = 0;
+        let score = 0;
+        let streak = 0;
+        let answered = false;
+
+        function loadQuestion(idx) {
+            answered = false;
+            currentQuestionIdx = idx;
+            const q = quizQuestions[idx];
+            document.getElementById('quiz-question').innerText = q.question;
+            document.getElementById('quiz-feedback').innerText = "Select an answer above!";
+            document.getElementById('quiz-feedback').className = "feedback-text";
+            document.getElementById('next-question-btn').style.display = "none";
+
+            const optionsContainer = document.getElementById('quiz-options');
+            optionsContainer.innerHTML = q.options.map((opt, i) => `
+                <button class="quiz-option-btn" onclick="selectQuizAnswer(${i})">
+                    <span>${String.fromCharCode(65 + i)}.</span> ${opt}
+                </button>
+            `).join('');
+        }
+
+        function selectQuizAnswer(chosenIdx) {
+            if (answered) return;
+            answered = true;
+
+            const q = quizQuestions[currentQuestionIdx];
+            const optionBtns = document.querySelectorAll('.quiz-option-btn');
+            optionBtns.forEach(btn => btn.disabled = true);
+
+            const feedbackEl = document.getElementById('quiz-feedback');
+
+            if (chosenIdx === q.answer) {
+                optionBtns[chosenIdx].classList.add('correct');
+                score++;
+                streak++;
+                feedbackEl.className = "feedback-text correct-msg";
+                feedbackEl.innerHTML = `✅ <strong>Correct!</strong> ${q.explanation}`;
+            } else {
+                optionBtns[chosenIdx].classList.add('wrong');
+                optionBtns[q.answer].classList.add('correct');
+                streak = 0;
+                feedbackEl.className = "feedback-text wrong-msg";
+                feedbackEl.innerHTML = `❌ <strong>Not quite!</strong> ${q.explanation}`;
+            }
+
+            document.getElementById('score-tracker').innerText = `Score: ${score} | Streak: ${streak} 🔥`;
+            document.getElementById('next-question-btn').style.display = "inline-flex";
+        }
+
+        function loadNextQuestion() {
+            let nextQ = (currentQuestionIdx + 1) % quizQuestions.length;
+            loadQuestion(nextQ);
+        }
+
+        // Initialize First Fact & First Question
+        displayFact(0);
+        loadQuestion(0);
+    </script>
+</body>
+</html>
